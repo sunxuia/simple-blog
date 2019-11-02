@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="template/two-column-layout">
+<head>
+    <title th:text="${article.title}">标题</title>
+    <meta th:if="false" http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <meta th:if="false" name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link th:if="false" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/main.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/two-column-layout.css" rel="stylesheet"/>
+    <link th:if="false" href="../../static/css/custom-input.css" rel="stylesheet"/>
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" th:href="@{https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css}" rel="stylesheet">
+    <link href="../../static/css/article-view.css" th:href="@{/css/article-view.css}" rel="stylesheet"/>
+
+    <script th:if="false" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap-hover-dropdown/2.2.1/bootstrap-hover-dropdown.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/1000hz-bootstrap-validator/0.11.9/validator.js"></script>
+    <script th:if="false" src="../../static/js/main.js"></script>
+    <script src="../../static/js/localstorage.js" th:src="@{/js/localstorage.js}"></script>
+    <script src="../../static/js/article-view.js" th:src="@{/js/article-view.js}"></script>
+
+    <script th:inline="javascript">
+        var articleId = Number.parseInt("[(${article.id})]");
+        $(function() {
+            var articleTitle = "[(${article.title})]";
+            var articleUrl = "[('/article/' + ${article.id})]";
+            saveViewHistory(articleUrl, articleTitle);
+        });
+    </script>
+</head>
+<body>
+<div class="container">
+    <!-- content -->
+    <div class="template-content" layout:fragment="template-content">
+        <div class="content-card">
+            <h3 th:text="${article.title}">标题</h3>
+            <div class="inner-inline">
+                <div class="text-left inner-inline">
+                    <p th:text="${article.author.name}">作者名</p>
+                    <p th:text="${T(net.sunxu.demo.sb.util.SbObjectUtils).date2String(article.releaseTime)}">昨天</p>
+                </div>
+                <div class="text-right inner-inline" style="float: right;">
+                    <span th:text="${article.readCount}">100</span>阅读
+                    <span th:text="${article.collectCount}">100</span>收藏
+                    <span th:text="${article.likeCount}">100</span>赞同
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card" th:if="isAdmin">
+            <h5><b>管理员操作</b></h5>
+            <form method="post" th:action="@{'/admin/article/' + ${article.id} + '/lock'}">
+                <button class="btn btn-default">锁定</button>
+            </form>
+        </div>
+
+        <div class="content-card" th:if="isAuthor">
+            <h5><b>作者操作</b></h5>
+            <div class="inner-inline-block">
+                <form method="post" th:action="@{'/article/' + ${article.id}}">
+                    <input type="hidden" name="_method" value="delete"/>
+                    <button class="btn btn-default">删除</button>
+                </form>
+                <a class="btn btn-default" href="#" th:href="@{'/article-edit/' + ${article.id}}">编辑</a>
+            </div>
+        </div>
+
+        <div class="content-card" th:if="${article.abstractText}">
+            <h5><b>摘要</b></h5>
+            <div class="content">
+                <p th:text="${article.abstractText}">正文内容</p>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="content">
+                <p th:text="${article.contentText}">正文内容</p>
+            </div>
+            <hr/>
+            <div class="content-operation inner-inline">
+                <div class="text-left inner-inline">
+                    <button class="btn btn-link btn-like"><span class="fa fa-thumbs-o-up"></span></button>
+                    <button class="btn btn-link btn-collect"><span class="fa fa-folder-open"></span></button>
+                </div>
+                <div class="text-right inner-inline" style="float: right;">
+                </div>
+            </div>
+        </div>
+        <div class="content-card" th:if="${!#lists.isEmpty(article.attachments)}">
+            <h5><b>附件</b></h5>
+            <ul class="attachment list-unstyled" th:each="attachment : ${article.attachments}">
+                <li>
+                    <span th:text="*{attachment.name}">文件1</span>
+                    <a href="file/abc.txt" th:href="@{*{attachment.url}}" download="abc.txt" th:download="*{attachment.name}">
+                        <span class="glyphicon glyphicon-floppy-save"></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="content-card">
+            <h5><b>评论</b></h5>
+            <p th:if="${article.commentCount == 0}">还没有评论.</p>
+            <div class="comments" th:if="${article.commentCount > 0}">
+                <div class="comment inner-inline" th:each="comment : ${comments}"
+                     data-id="100" th:attr="data-id=*{comment.id}">
+                    <div class="comment-user">
+                        <img width="50px;height: auto;" src="../../static/images/user.png" th:src="*{comment.user.avatarUrl}"/>
+                        <div><a class="comment-user-name" href="#" th:href="*{comment.user.url}">sunxu</a></div>
+                    </div>
+                    <div class="comment-content">
+                        <small class="comment-time" th:text="*{T(net.sunxu.demo.sb.util.SbObjectUtils).date2String(comment.time)}">
+                            2018-7-30
+                        </small>
+                        <div class="comment-content">
+                            <p th:text="*{comment.text}">评论内容</p>
+                        </div>
+                        <!--<div class="comment-option" sec:authorize="isAuthenticated()">-->
+                        <div class="comment-option">
+                            <button class="btn btn-link comment-reply">回复</button>
+                            <button class="btn btn-link comment-delete" th:if="user.id == comment.user.id">删除</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <th:block th:replace="~{template/pagination::pagination(${commentPageCount}, ${commentPage}, |/article/${article.id}?commentCount=${commentCount}&commentPage=|)}"></th:block>
+        </div>
+        <div class="create-comment content-card">
+            <h5><b>发表评论</b></h5>
+            <form class="form" method="post" th:action="@{'/article/' + ${article.id} + '/comment'}">
+                <textarea name="text" class="form-control" rows="2" maxlength="100"
+                          placeholder="写些什么, 不超过100字."></textarea>
+                <br/>
+                <button class="btn btn-info btn-sm">提交</button>
+            </form>
+        </div>
+
+        <div id="collect-modal" class="modal fade" role="dialog" aria-labelledby="collect-modal" style="min-width: 450px">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header inner-inline">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4><b>收藏</b></h4>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="collect-list">
+                            <li th:each="col : ${collections}" data-id="100" th:attr="data-id=*{col.id}">
+                                <label class="collect-name" th:text="${col.name}">item name</label>
+                                <input type="checkbox" class="round-input collect-select" th:checked="*{col.collected}"/>
+                            </li>
+                        </ul>
+                        <button id="collect-create-new" class="btn btn-primary">创建新收藏夹</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

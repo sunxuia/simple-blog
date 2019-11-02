@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="template/two-column-layout">
+<head>
+    <meta th:if="false" http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <meta th:if="false" name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link th:if="false" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/main.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/two-column-layout.css" rel="stylesheet"/>
+
+    <script th:if="false" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap-hover-dropdown/2.2.1/bootstrap-hover-dropdown.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/1000hz-bootstrap-validator/0.11.9/validator.js"></script>
+    <script th:if="false" src="../../static/js/main.js"></script>
+    <style>
+        .notify-category {
+            width: 150px;
+            float: left;
+        }
+
+        .notify-category a .badge {
+            background: #337ab7;
+            float: right;
+            margin-top: 2px;
+        }
+
+        .notify-category li {
+            box-shadow: -1px 1px 1px rgba(26, 26, 26, .1);
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+
+        .notify-category li:first-child {
+            border-top: 2px solid rgba(26, 26, 26, .05);
+        }
+
+        .notify-category li.active {
+            background-color: #ffffff;
+            right: -3px;
+        }
+
+        #notify-body {
+            border: solid 2px rgba(26, 26, 26, .05);
+            overflow: hidden;
+            min-height: 175px;
+            background-color: #ffffff;
+        }
+
+        .notify-tab {
+            margin: 5px;
+            padding: 5px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .notify-tab:last-child {
+            border-bottom: none;
+        }
+
+        .notify-tab img {
+            border-radius: 30px;
+            border: 2px solid #e5e5e5;
+            margin-right: 5px;
+            width: 50px;
+            height: auto;
+            vertical-align: top;
+            float: left;
+        }
+
+        .notify-tab .notify-tab-content {
+            vertical-align: top;
+            overflow: hidden;
+        }
+
+        .notify-tab .notify-tab-user {
+            color: #666666;
+        }
+
+        .notify-tab .notify-tab-user a {
+            color: #666666;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .notify-tab .notify-tab-user a:hover {
+            text-decoration: none;
+        }
+
+        .notify-tab .notify-tab-user .close {
+            float: right;
+            position: relative;
+            top: -4px;
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+
+        .notify-tab .notify-abstract {
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .notify-tab .notify-cite {
+            padding: 3px 5px 3px 5px;
+            background-color: #f6f6f6;
+            font-size: 12px;
+            border-radius: 5px;
+        }
+
+        .notify-tab .notify-cite a {
+            text-decoration: none;
+        }
+    </style>
+    <script>
+        $(function () {
+            $(".notify-tab .close").on("click", function () {
+                var tab = $(this).parents(".notify-tab"),
+                    id = tab.data("id");
+                tab.slideUp("slow", function () {
+                    tab.remove();
+                });
+                $.delete("/user/notify/" + id);
+            })
+        });
+    </script>
+</head>
+<body>
+<!-- content -->
+<div class="container">
+    <div class="template-content" layout:fragment="template-content">
+        <ol class="breadcrumb" layout:fragment="breadcrumb">
+            <li><a href="#">用户</a></li>
+            <li><a href="#">通知</a></li>
+        </ol>
+
+        <ul class="nav nav-stacked notify-category">
+            <li th:classappend="${type== 'user'} ? 'active'">
+                <a href="#" th:href="@{/user/notify?type=user}">用户通知<span class="badge" th:text="${userNotifyCount == 0 ? '' : userNotifyCount}">100</span></a>
+            </li>
+            <li th:classappend="${type== 'system'} ? 'active'">
+                <a href="#" th:href="@{/user/notify?type=system}">系统通知<span class="badge" th:text="${systemNotifyCount == 0 ? '' : systemNotifyCount}">10000</span></a>
+            </li>
+        </ul>
+
+        <div id="notify-body">
+            <div class="notify-tab" th:each="notify : ${notifies}" data-id="0" th:attr="data-id=*{notify.id}">
+                <img src="../../static/images/user.png" th:src="*{notify.user.avatarUrl}"/>
+                <div class="notify-tab-content">
+                    <div class="notify-tab-user">
+                        <a href="#" th:href="@{*{notify.user.url}}" th:text="*{notify.user.name}">王大拿</a>
+                        <span th:text="*{notify.action}">说</span>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <small style="float: right;" th:text="*{T(net.sunxu.demo.sb.util.SbObjectUtils).date2String(notify.time)}">
+                            2018-7-31
+                        </small>
+                    </div>
+                    <a class="notify-abstract" href="#" th:href="@{*{notify.url}}" th:text="*{notify.text}">
+                        说的内容说的内容说的内容说的内容说的内容说的内容说的内容说的内容说的内容说的内容.
+                    </a>
+                    <div class="notify-cite" th:if="*{notify.hasRef}">
+                        <a href="#" th:remove="*{#strings.isEmpty(notify.refUrl)} ? 'tag' : 'none'" th:href="@{*{notify.refUrl}}"
+                        <small th:text="*{notify.refText}">引用的内容</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

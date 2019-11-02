@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="template/two-column-layout">
+<head>
+    <meta th:if="false" http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <meta th:if="false" name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link th:if="false" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/main.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/two-column-layout.css" rel="stylesheet"/>
+
+    <script th:if="false" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap-hover-dropdown/2.2.1/bootstrap-hover-dropdown.js"></script>
+    <script th:if="false" src="../../static/js/main.js"></script>
+    <style>
+        table thead th:first-child, table td:first-child {
+            display: none;
+        }
+    </style>
+    <script>
+        $(function () {
+            var modal = $("#info-modal"), form = modal.find("form");
+            $("#add-new").on("click", function () {
+                form[0].reset();
+                modal.find("[name=_method]").remove();
+                modal.find("[type=submit]").text("新增");
+                modal.modal();
+            });
+            $("table tr td:nth-last-child(1) > button:nth-child(2)").on("click", function () {
+                var row = $(this).parents("tr");
+                var res = alert("将会删除目录下的所有文章, 是否删除?");
+                if (res) {
+                    $.delete("/collection/" + row.find("tr:nth-child(1)").text(), {
+                        success: function () {
+                            row.remove();
+                            flashModal("alert alert-success", "删除成功");
+                        }
+                    });
+                }
+            });
+            $("table tr td:nth-last-child(1) > button:nth-child(1)").on("click", function () {
+                var row = $(this).parents("tr");
+                form.find("[name=id]").val(row.find("td:nth-child(1)").text());
+                form.find("[name=name]").val(row.find("td:nth-child(2)").text());
+                form.find("[name=description]").val(row.find("td:nth-child(3)").text());
+                form.append('<input type="hidden" name="_method" value="put" />');
+                modal.find("[type=submit]").text("修改");
+                modal.modal();
+            })
+        });
+    </script>
+</head>
+<body>
+<div class="container">
+    <!-- content -->
+    <div layout:fragment="template-content">
+        <ol class="breadcrumb" layout:fragment="breadcrumb">
+            <li class="active">分类</li>
+        </ol>
+
+        <div>
+            <button id="add-new" class="btn btn-info">新增分类</button>
+        </div>
+
+        <div id="info-modal" class="modal fade">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header inner-inline">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4><b>分类</b></h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" method="post" action="#" th:action="@{/category/}" role="form">
+                            <input type="hidden" name="id"/>
+                            <div class="form-group">
+                                <label class="control col-sm-3 control-label">名称</label>
+                                <div class="col-sm-9">
+                                    <input type="text" autocomplete="off" name="name" class="form-control primary">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control col-sm-3 control-label">简介</label>
+                                <div class="col-sm-9">
+                                    <textarea name="description" class="form-control" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="city-holder"></div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">新增</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <table class="table table-striped">
+            <thead>
+            <th>id</th>
+            <th width="100px">名称</th>
+            <th width="200px">简介</th>
+            <th width="50px">文章</th>
+            <th width="100px">创建时间</th>
+            <th width="100px">操作</th>
+            </thead>
+            <tbody>
+            <tr th:each="cat : ${categories}">
+                <td th:text="${cat.id}">100</td>
+                <td><a href="#" th:href="@{'/category/' + *{cat.id}}" th:text="*{cat.name}">默认分类</a></td>
+                <td th:text="*{cat.description}">默认分类</td>
+                <td th:text="*{cat.articleCount}">0</td>
+                <td th:text="*{T(net.sunxu.demo.sb.util.SbObjectUtils).date2String(cat.releaseTime)}">2018-08-01</td>
+                <td class="inner-inline-block">
+                    <button class="btn btn-info input-sm">修改</button>
+                    <button class="btn btn-danger input-sm">删除</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

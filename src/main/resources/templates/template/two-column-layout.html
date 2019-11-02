@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="template/base-layout">
+<head>
+    <meta th:if="false" http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <meta th:if="false" name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link th:if="false" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/main.css" rel="stylesheet">
+    <link href="../../static/css/two-column-layout.css" th:href="@{/css/two-column-layout.css}" rel="stylesheet"/>
+
+    <script th:if="false" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap-hover-dropdown/2.2.1/bootstrap-hover-dropdown.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/1000hz-bootstrap-validator/0.11.9/validator.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/modernizr/2.8.3/modernizr.js"></script>
+    <script th:if="false" src="../../static/js/main.js"></script>
+    <script>
+        $(function () {
+            $("button[data-target='.sidebar']").on('click', function () {
+                var btn = $(this);
+                if ($(".sidebar").attr("class").indexOf(' in') == -1) {
+                    btn.html("收起侧栏 <span class='caret caret-reversed'></span>");
+                } else {
+                    btn.html("展开侧栏 <span class='caret'></span>");
+                }
+            })
+
+            function showWarning() {
+                bottomWarning("<p>这个网页部分内容在当前浏览器中不能正确显示。<br/>" +
+                    "请使用最新的<a href='https://www.firefox.com.cn/'>Firefox</a>" +
+                    "或<a href='https://www.google.cn/intl/zh-CN/chrome/'>Chrome</a>浏览器以获得更好的体验。</p>");
+            }
+
+            if (!Modernizr.flexbox) {
+                showWarning();
+            }
+        });
+    </script>
+</head>
+<body layout:fragment="body">
+<!-- header -->
+<th:block layout:fragment="header" th:replace="~{template/header::header(${ {{'热门', '/rank/article?type=like'}, {'用户', '/rank/user?type=like'}} })}"></th:block>
+
+<div class="container">
+
+    <!-- sidebar -->
+    <button type="button" class="btn visible-xs" style="margin-top: 12px;" data-toggle="collapse" data-target=".sidebar">
+        展开侧栏 <span class="caret"></span>
+    </button>
+    <div class="sidebar nav collapse navbar-collapse navbar-responsive-collapse">
+        <ul class="nav">
+            <li sec:authorize="isAnonymous()">
+                <div class="area">
+                    <div style="text-align:center;">
+                        <br/>
+                        <p style="margin-bottom: 0px">
+                            <a href="#" data-toggle="modal" data-target="#login">登录</a>后查看更多功能
+                        </p>
+                        <br/>
+                    </div>
+                </div>
+            </li>
+            <th:block layout:fragment="sidebar-items"></th:block>
+            <li class="nav-divider"></li>
+            <li><a href="/contact-me">联系我</a></li>
+        </ul>
+        <li class="nav-divider visible-xs"></li>
+    </div>
+
+    <!-- content -->
+    <div class="template-content" layout:fragment="template-content">
+        页面内容<br/>
+        页面内容<br/>
+        页面内容<br/>
+    </div>
+</div>
+
+<!-- footer -->
+<th:block th:replace="~{template/footer::footer}">
+    <div class="template-footer">
+        <div class="container">
+            <p>Copyleft @2018</p>
+            <a href="#">contact me</a>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

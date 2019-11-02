@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="template/two-column-layout">
+<head>
+    <meta th:if="false" http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <meta th:if="false" name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link th:if="false" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/main.css" rel="stylesheet">
+    <script th:if="false" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap-hover-dropdown/2.2.1/bootstrap-hover-dropdown.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/1000hz-bootstrap-validator/0.11.9/validator.js"></script>
+    <script th:if="false" src="../../static/js/main.js"></script>
+    <link th:if="false" href="../../static/css/two-column-layout.css" rel="stylesheet"/>
+
+    <style>
+        .search-link {
+            margin: 10px 5px 10px 5px;
+        }
+
+        .search-content:not(:last-child) {
+            border-bottom: 1px solid #eaeaea;
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+        }
+
+        .search-content .search-display {
+            color: black;
+            text-decoration: none;
+        }
+
+        .search-content .search-display:hover {
+            color: darkgray;
+        }
+
+        .search-content .title-link {
+            color: #77839c;
+            text-decoration: none;
+        }
+
+        .search-content .content-author {
+            float: left;
+        }
+
+        .search-content .content-author img {
+            max-width: 20px;
+            max-height: 20px;
+            width: auto;
+            height: auto;
+        }
+
+        .search-content .content-addition {
+            text-align: right;
+        }
+
+        .pagination {
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+    </style>
+    <script>
+        function highlight(keywords, textRange) {
+            var keywordArray = keywords.split(" "); //分割
+            for (var ti = 0; ti < textRange.length; ti++) {
+                for (var ki = 0; ki < keywordArray.length; ki++) {
+                    //创建表达式，匹配替换
+                    var reg = new RegExp("(" + keywordArray[ki].replace(/,/, "|") + ")", "ig");
+                    //替换重新写入
+                    textRange[ti].innerHTML = textRange[ti].innerHTML.replace(reg, '<span style="color: red">$1</span>');
+                }
+            }
+        }
+
+        function search() {
+            window.location.href = "/search?type=" + $("[name=search-type]").val() + "&keyText=" + encodeURI($("[name=search-text]").val());
+        }
+
+        function setAdviceSearch() {
+            $.get("/index/advice-search", function (list) {
+                list.forEach(function (item) {
+                    $(".advice-search")
+                        .append('<a class="search-link" href="' + encodeURI(item.value) + '">' + item.key + '</a>');
+                });
+            });
+        }
+
+        $(function () {
+            var highlightText = $("[name=search-text]").val();
+            highlight(highlightText, $(".search-display"));
+            highlight(highlightText, $(".title-link"));
+            setAdviceSearch();
+        });
+    </script>
+</head>
+<body>
+<!-- content -->
+<div class="container">
+    <div class="template-content" layout:fragment="template-content">
+        <div class="content-card">
+            <form id="search-form" action="/search" method="post">
+                <div class="input-group" style="max-width: 360px">
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">标题和内容<span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="javascript:void(0)" onclick="setSearchItem(this)" data-value="title-content">标题和内容</a></li>
+                            <li><a href="javascript:void(0)" onclick="setSearchItem(this)" data-value="title">标题</a></li>
+                            <li><a href="javascript:void(0)" onclick="setSearchItem(this)" data-value="author">作者</a></li>
+                        </ul>
+                    </span>
+                    <input name="search-type" type="hidden" value="title-content" th:value="${isSearchResult ? type : 'title-content'}"/>
+                    <input name="search-text" type="text" autocomplete="off" class="form-control primary" value="content" th:value="${isSearchResult ? keyText : ''}">
+                    <span class="input-group-btn"><button class="btn btn-primary" type="button" onclick="search()">搜索</button></span>
+                </div>
+            </form>
+            <div class="inner-inline advice-search"></div>
+            <div th:if="${isSearchResult}">
+                <p>共搜到
+                    <span th:text="${total}">100</span>条关于
+                    <span th:text="${keyText}">content</span> 的结果
+                    <th:block th:if="${total > 0}">, 现在显示的是第
+                        <span th:text="${page * count - count}">0</span>到
+                        <span th:text="${page * count - count + results.size()}">20</span>条结果.
+                    </th:block>
+                </p>
+            </div>
+            <div th:unless="${isSearchResult}">
+                <p>输入关键词搜索相关文章</p>
+            </div>
+        </div>
+
+        <div class="content-card" th:if="${isSearchResult}">
+            <div class="content">
+                <div class="search-content" th:if="isSearchResult" th:each="res : ${results}">
+                    <div class="content-head">
+                        <a class="title-link" href="#" th:href="@{${res.url}}">
+                            <strong class="title" th:text="${res.title}">title of content</strong>
+                        </a>
+                        <div>
+                            <div class="content-author">
+                                <img class="author-avatar" src="../../static/images/default-avatar.png" th:src="${res.author.avatarUrl}"/>
+                                <a class="author-name" href="#" th:href="@{${res.author.url}}" th:text="${res.author.name}">
+                                    author name
+                                </a>
+                            </div>
+                            <div class="content-addition">
+                                <div class="footer-info inner-inline">
+                                    <p><span class="like-count" th:text="${res.likeCount}">0</span>赞</p>
+                                    <p>
+                                        <span class="create-time" th:text="${T(net.sunxu.demo.sb.util.SbObjectUtils).date2String(res.releaseTime)}">昨天</span>发表
+                                    </p>
+                                    <p th:if="${!res.releaseTime.equals(res.lastModifiedTime)}">
+                                        <span class="create-time" th:text="${T(net.sunxu.demo.sb.util.SbObjectUtils).date2String(res.lastModifiedTime)}">昨天</span>发表
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a class="search-display" href="#" th:href="@{${res.url}}" th:text="${res.brief}">
+                        content
+                    </a>
+                </div>
+            </div>
+
+            <th:block th:if="${isSearchResult}" th:replace="~{template/pagination::pagination(${pageCount}, ${page}, |/search?keyText=${keyText}&type=${type}&count=${count}&page=|)}"></th:block>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="template/two-column-layout">
+<head>
+    <meta th:if="false" http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <meta th:if="false" name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link th:if="false" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/main.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/two-column-layout.css" rel="stylesheet"/>
+    <link href="../../static/css/index.css" th:href="@{/css/index.css}" rel="stylesheet">
+
+    <script th:if="false" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap-hover-dropdown/2.2.1/bootstrap-hover-dropdown.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/1000hz-bootstrap-validator/0.11.9/validator.js"></script>
+    <script th:if="false" src="../../static/js/main.js"></script>
+    <script src="../../static/js/index.js" th:src="@{/js/index.js}"></script>
+</head>
+<body>
+<!-- content -->
+<div class="container">
+    <div layout:fragment="template-content">
+        <div class="content-card">
+            <form id="search-form" action="/search" method="post">
+                <div class="input-group" style="max-width: 360px">
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">标题和内容<span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="javascript:void(0)" onclick="setSearchItem(this)" data-value="title-content">标题和内容</a></li>
+                            <li><a href="javascript:void(0)" onclick="setSearchItem(this)" data-value="title">标题</a></li>
+                            <li><a href="javascript:void(0)" onclick="setSearchItem(this)" data-value="author">作者</a></li>
+                        </ul>
+                    </span>
+                    <input name="search-type" type="hidden" value="title-content"/>
+                    <input name="search-text" type="text" autocomplete="off" class="form-control primary">
+                    <span class="input-group-btn"><button class="btn btn-primary" type="button" onclick="search()">搜索</button></span>
+                </div>
+            </form>
+            <div class="inner-inline advice-search"></div>
+        </div>
+        <div id="content"></div>
+        <button id="show-more" class="btn btn-default" style="display:none;" onclick="javascript:showMore()">
+            加载更多
+        </button>
+    </div>
+</div>
+
+<!-- sidebar -->
+<div class="sidebar">
+    <ul class="nav" layout:fragment="sidebar-items">
+        <li>
+            <div class="area" sec:authorize="isAuthenticated()">
+                <div class="small-card">
+                    <a href="#">
+                        <div class="card-name">新建</div>
+                        <img src="../../static/images/pencil.png" th:src="'/images/pencil.png'">
+                    </a>
+                </div>
+                <div class="small-card">
+                    <a href="#">
+                        <div class="card-name"><p>草稿</p></div>
+                        <img src="../../static/images/sketch.png" th:src="'/images/sketch.png'">
+                    </a>
+                </div>
+                <div class="small-card">
+                    <a href="#">
+                        <div class="card-name"><p>文章列表</p></div>
+                        <img src="../../static/images/list.png" th:src="'/images/list.png'">
+                    </a>
+                </div>
+                <div class="small-card">
+                    <a href="#">
+                        <div class="card-name">个人首页</div>
+                        <img src="../../static/images/home.png" th:src="'/images/home.png'">
+                    </a>
+                </div>
+                <div class="small-card">
+                    <a href="#">
+                        <div class="card-name"><p>用户信息</p></div>
+                        <img src="../../static/images/user.png" th:src="'/images/user.png'">
+                    </a>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

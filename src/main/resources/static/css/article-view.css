@@ -1,0 +1,78 @@
+.content-operation .btn-link {
+    outline: none;
+}
+
+.comment {
+    border: 1px solid lightgray;
+    padding: 5px 10px 5px 10px;
+    vertical-align: top;
+    border-radius: 5px;
+}
+
+.comment:not(:last-child) {
+    border-bottom: none;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+.comment:not(:first-child) {
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
+
+.comment .comment-user {
+    border-right: 1px solid lightgray;
+    padding-right: 5px;
+    margin-right: 5px;
+    text-align: center;
+}
+
+.comment .comment-content {
+    vertical-align: top;
+    width: 80%;
+}
+
+.collect-list {
+    list-style: none;
+    padding-left: 0px;
+    font-size: 20px;
+}
+
+.collect-list li {
+    padding: 10px 10px 10px 10px;
+    background: #f8f8f8;
+}
+
+.collect-list :first-child {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.collect-list :last-child {
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+.collect-list li:not(:last-child) {
+    border-bottom: 1px solid #e6e6e6;
+}
+
+.collect-list li .collect-name {
+    font-weight: normal;
+}
+
+.collect-list li:hover {
+    background: #ffffff;
+}
+
+.collect-list li .collect-select {
+    float: right;
+}
+
+.attachment li {
+    margin: 5px 5px 5px 10px;
+}
+
+.attachment .glyphicon-floppy-save:hover {
+    cursor: pointer;
+}

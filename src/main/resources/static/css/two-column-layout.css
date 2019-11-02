@@ -1,0 +1,107 @@
+/* non-sx layout */
+@media screen and (min-width: 768px) {
+    body > .container {
+        display: -webkit-flex;
+        display: flex;
+        flex-flow: row-reverse nowrap;
+        justify-content: space-between;
+    }
+
+    body > .container > .template-content {
+        flex: 1 1 auto;
+        margin: 10px 10px auto auto;
+        min-width: 400px;
+    }
+
+    .sidebar, .sidebar > ul {
+        width: 280px;
+    }
+}
+
+/* xs layout */
+@media screen and (max-width: 768px) {
+    body > .container {
+        display: -webkit-flex;
+        display: flex;
+        flex-flow: column;
+    }
+
+    body > .container > .template-content {
+        margin-top: 20px;
+        min-width: 400px;
+    }
+
+    body > .container > * {
+        width: 100%;
+    }
+
+    .sidebar, .sidebar > ul {
+        position: relative;
+    }
+}
+
+/* sidebar */
+.sidebar .nav a {
+    height: 42px;
+}
+
+.sidebar li > a:hover:not(.disabled) {
+    color: black;
+    border: 1px #77839c solid;
+    border-radius: 5px;
+}
+
+.sidebar .area {
+    background-color: #fff;
+    -webkit-box-shadow: 0px 1px 3px rgba(26, 26, 26, 0.1);
+    -moz-box-shadow: 0px 1px 3px rgba(26, 26, 26, 0.1);
+    box-shadow: 0px 1px 3px rgba(26, 26, 26, 0.1);
+    margin: 10px 5px 10px 0px;
+    padding: 5px 10px 5px 10px;
+    border-radius: 2px;
+    box-sizing: border-box;
+    display: -webkit-flex;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+}
+
+.sidebar .area > * {
+    flex: 1 1 auto;
+}
+
+.sidebar .small-card {
+    position: relative;
+    height: 60px;
+    width: 60px;
+    margin-left: 10px;
+    margin-right: 10px;
+    overflow: hidden;
+    flex: 0 0 60px !important;
+}
+
+.sidebar .small-card img {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    z-index: 1;
+    height: 56px;
+    width: 56px;
+    text-align: center;
+}
+
+.sidebar .small-card .card-name {
+    position: relative;
+    top: 60px;
+    left: 2px;
+    z-index: 2;
+    width: 56px;
+    height: 56px;
+    padding-top: 15px;
+    text-align: center;
+    background-color: #ffffff;
+    opacity: 0.9;
+    border: 1px black dashed;
+}
+

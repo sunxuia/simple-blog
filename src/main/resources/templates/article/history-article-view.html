@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="template/two-column-layout">
+<head>
+    <meta th:if="false" http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <meta th:if="false" name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link th:if="false" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/main.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/two-column-layout.css" rel="stylesheet"/>
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/custom-input.css" rel="stylesheet"/>
+
+    <script th:if="false" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap-hover-dropdown/2.2.1/bootstrap-hover-dropdown.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/1000hz-bootstrap-validator/0.11.9/validator.js"></script>
+    <script th:if="false" src="../../static/js/main.js"></script>
+
+    <style>
+        .area {
+            background-color: #fffffc;
+            padding: 5px 10px 5px 10px;
+            margin: 10px 5px 10px 5px;
+            border: none;
+            border-radius: 3px;
+            box-shadow: 1px 1px 1px rgba(26, 26, 26, .1);
+        }
+    </style>
+
+</head>
+<body>
+<!-- content -->
+<div class="container">
+    <div class="content" layout:fragment="template-content">
+        <input type="hidden" name="article-id" th:value="100"/>
+        <div class="area">
+            <h4 style="text-align: right">历史存档 <span>2018-8-1</span>(<span>1234</span>)</h4>
+            <h3>标题</h3>
+            <div class="inner-inline">
+                <div class="text-left inner-inline" style="left: 0px">
+                    <p>作者名</p>
+                    <p>2018-08-01</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="area">
+            <h5><b>摘要</b></h5>
+            <div class="content">
+                <p>摘要内容</p>
+            </div>
+        </div>
+
+        <div class="area">
+            <h5><b>正文</b></h5>
+            <div class="content">
+                <p>正文内容</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

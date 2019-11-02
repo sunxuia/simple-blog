@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head th:if="false">
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <link href="../../static/css/main.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap-hover-dropdown/2.2.1/bootstrap-hover-dropdown.js"></script>
+    <script src="https://cdn.bootcss.com/1000hz-bootstrap-validator/0.11.9/validator.js"></script>
+    <script src="../../static/js/main.js"></script>
+</head>
+<body>
+<!-- navbar -->
+<th:block th:fragment="header(navs)">
+    <nav class="template-header navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">SB</a>
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <ul class="nav collapse navbar-collapse navbar-responsive-collapse">
+                <li class="navbar-text">
+                <li th:each="nav : ${navs}" class="navbar-text">
+                    <a href="#" th:href="@{${nav[1]}}">[[${nav[0]}]]</a>
+                </li>
+                <li class="navbar-text">
+                    <form id="search-form" action="/search" method="post" style="margin-top: 5px">
+                        <div class="input-group" style="width: 250px">
+                            <input type="text" autocomplete="off" class="form-control input-sm">
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary btn-sm" type="button"
+                                        onclick="javascript:window.location.href='/search?keyText=' + $(this).parents('.input-group').find('input').val()">
+                                    搜索
+                                </button>
+                            </span>
+                        </div>
+                    </form>
+                </li>
+                <li class="navbar-text navbar-right navbar-login" sec:authorize="isAnonymous()">
+                    <a href="#" data-toggle="modal" data-target="#login">登录 | 注册</a>
+                </li>
+                <li class="navbar-text navbar-right dropdown navbar-about-me" sec:authorize="isAuthenticated()">
+                    <a class="navbar-link dropdown-toggle hidden-xs" href="javascript:void(0)" data-target="#about-me > ul" data-toggle="dropdown" data-hover="dropdown">
+                        <span th:text="${user.username}">关于我</span>
+                        <span class="badge" th:unless="${user.notifyCount == 0}" th:text="${user.notifyCount}">100</span>
+                    </a>
+                    <a class="navbar-link visible-xs" style="color:#337ab7" href="/about-me">
+                        <span th:text="${user.username}">关于我</span>
+                        <span class="badge">100</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-default">
+                        <li>
+                            <a href="#" th:href="@{'/user/' + ${user.id}}"><span><img src="../../static/images/default-avatar.png" th:src="@{${user.avatarUrl}}"></span>我的主页</a>
+                        </li>
+                        <li>
+                            <a href="#" th:href="@{/user/notify}">我的消息<span class="badge">100</span></a>
+                        </li>
+                        <li>
+                            <a href="#" th:href="@{/setting}">修改个人信息</a>
+                        </li>
+                        <li class="divider" role="separator"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post">
+                                <button type="submit" class="btn btn-link">登出</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div id="login" class="modal fade" sec:authorize="isAnonymous()">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header inner-inline">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><b>登录</b></h4>
+                </div>
+                <div class="modal-body">
+                    <div th:replace="~{template/login::login}">login content</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

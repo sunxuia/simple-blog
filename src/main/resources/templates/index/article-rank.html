@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="template/two-column-layout">
+<head>
+    <meta th:if="false" http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <meta th:if="false" name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link th:if="false" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/main.css" rel="stylesheet">
+    <script th:if="false" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap-hover-dropdown/2.2.1/bootstrap-hover-dropdown.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/1000hz-bootstrap-validator/0.11.9/validator.js"></script>
+    <script th:if="false" src="../../static/js/main.js"></script>
+    <link th:if="false" href="../../static/css/two-column-layout.css" rel="stylesheet"/>
+
+    <style>
+        .rank-link {
+            margin: 10px 5px 10px 5px;
+        }
+
+        .rank-content:not(:last-child) {
+            border-bottom: 1px solid #eaeaea;
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+        }
+
+        .rank-content .rank-display {
+            color: black;
+            text-decoration: none;
+        }
+
+        .rank-content .rank-display:hover {
+            color: darkgray;
+        }
+
+        .rank-content .title-link {
+            color: #77839c;
+            text-decoration: none;
+        }
+
+        .rank-content .content-author {
+            float: left;
+        }
+
+        .rank-content .content-author img {
+            max-width: 20px;
+            max-height: 20px;
+            width: auto;
+            height: auto;
+        }
+
+        .rank-content .content-addition {
+            text-align: right;
+        }
+
+        .pagination {
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+<!-- content -->
+<div class="container">
+    <div class="template-content" layout:fragment="template-content">
+        <div class="content-card">
+            <div class="content">
+                <div class="rank-content" th:each="article : ${articles}">
+                    <div class="content-head">
+                        <a class="title-link" href="#" th:href="@{${article.url}}">
+                            <strong class="title" th:text="${article.title}">title of content</strong>
+                        </a>
+                        <div>
+                            <div class="content-author">
+                                <img class="author-avatar" src="../../static/images/default-avatar.png" th:src="${article.author.avatarUrl}"/>
+                                <a class="author-name" href="#" th:href="@{${article.author.url}}" th:text="${article.author.name}">
+                                    author name
+                                </a>
+                            </div>
+                            <div class="content-addition">
+                                <div class="footer-info inner-inline">
+                                    <p><span class="like-count" th:text="${article.likeCount}">0</span>赞</p>
+                                    <p>
+                                        <span class="create-time" th:text="${T(net.sunxu.demo.sb.util.SbObjectUtils).date2String(article.releaseTime)}">昨天</span>发表
+                                    </p>
+                                    <p th:if="${!article.releaseTime.equals(article.lastModifiedTime)}">
+                                        <span class="create-time" th:text="${T(net.sunxu.demo.sb.util.SbObjectUtils).date2String(article.lastModifiedTime)}">昨天</span>发表
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a class="rank-display" href="#" th:href="@{${article.url}}" th:text="${article.brief}">
+                        content
+                    </a>
+                </div>
+            </div>
+
+            <th:block th:replace="~{template/pagination::pagination(${pageCount}, ${page}, |/rank/article?type=${type}&count=${count}&page=|)}"></th:block>
+        </div>
+    </div>
+</div>
+</body>
+</html>

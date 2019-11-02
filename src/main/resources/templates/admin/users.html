@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="template/two-column-layout">
+<head>
+    <meta th:if="false" http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <meta th:if="false" name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link th:if="false" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/main.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/two-column-layout.css" rel="stylesheet"/>
+
+    <script th:if="false" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap-hover-dropdown/2.2.1/bootstrap-hover-dropdown.js"></script>
+    <script th:if="false" src="../../static/js/main.js"></script>
+    <style>
+        .btn-lock-user:after {
+            content: "锁定";
+        }
+
+        .btn-lock-user {
+            background-color: #cf5b56;
+        }
+
+        .btn-lock-user, .btn-lock-user.unlock, .btn-lock-user:hover, .btn-lock-user:focus {
+            color: white;
+        }
+
+        .btn-lock-user.unlock:after {
+            content: "解除锁定";
+        }
+
+        .btn-lock-user.unlock {
+            background-color: green;
+        }
+    </style>
+    <script>
+        $(function () {
+            $(".btn-lock-user").on("click", function () {
+                var btn = $(this);
+                $.put("/admin/lock-user", {
+                    "userId": btn.parents("tr").data("id"),
+                    "isLock": !btn.hasClass("unlock")
+                }, function () {
+                    btn.toggleClass("unlock");
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+<div class="container">
+    <!-- content -->
+    <div class="template-content" layout:fragment="template-content">
+
+        <ol class="breadcrumb" layout:fragment="breadcrumb">
+            <li class="active">用户列表</li>
+        </ol>
+
+        <div class="content-card">
+            <div class="inner-inline-block">
+                <a class="btn btn-link float-right" title="排序"
+                   th:href="@{|/article/list?sortType=${sortType}&page=${page}&count=${count}&asc=${!asc}|}">
+                    <span class="glyphicon glyphicon-sort-by-attributes"
+                          th:class="${'glyphicon ' + (asc?'glyphicon-sort-by-attributes':'glyphicon-sort-by-attributes-alt')}"></span>
+                </a>
+                <div class="float-right">
+                    <select class="selectpicker form-control dropdown" onchange="window.location=this.value;">
+                        <option value="#" th:selected="${sortType=='registerTime'}" th:value="@{|/article/list?sortType=registerTime&page=${page}&count=${count}&asc=${asc}|}">
+                            注册时间
+                        </option>
+                        <option value="#" th:selected="${sortType=='userName'}" th:value="@{|/article/list?sortType=userName&page=${page}&count=${count}&asc=${asc}|}">
+                            用户名称
+                        </option>
+                        <option value="#" th:selected="${sortType=='loginTime'}" th:value="@{|/article/list?sortType=loginTime&page=${page}&count=${count}&asc=${asc}|}">
+                            登录时间
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <table class="table table-striped">
+                <thead>
+                <th width="100px">名称</th>
+                <th width="100px">自我介绍</th>
+                <th width="100px">创建时间</th>
+                <th width="100px">上次登录</th>
+                <th width="100px">操作</th>
+                </thead>
+                <tbody>
+                <tr th:each="user : ${users}" data-id="100" th:attr="data-id=*{user.id}">
+                    <td><a href="#" th:href="@{'/user/' + *{user.id}}" th:text="*{user.name}">默认用户</a></td>
+                    <td th:text="*{user.selfIntroduction}">介绍</td>
+                    <td th:text="*{T(net.sunxu.demo.sb.util.SbObjectUtils).date2String(user.registerTime)}">2018-08-01
+                    </td>
+                    <td th:text="*{T(net.sunxu.demo.sb.util.SbObjectUtils).date2String(user.lastLoginTime)}">
+                        2018-08-01
+                    </td>
+                    <td class="inner-inline-block">
+                        <button class="btn input-sm btn-lock-user" th:classappend="*{user.isLocked}?'unlock'"></button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

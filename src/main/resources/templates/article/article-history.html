@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="template/two-column-layout">
+<head>
+    <meta th:if="false" http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <meta th:if="false" name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link th:if="false" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/main.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/two-column-layout.css" rel="stylesheet"/>
+    <link href="https://cdn.bootcss.com/bootstrap-switch/4.0.0-alpha.1/css/bootstrap-switch.css" th:href="@{https://cdn.bootcss.com/bootstrap-switch/4.0.0-alpha.1/css/bootstrap-switch.min.css}" rel="stylesheet">
+    <link href="../../static/css/diffview-custom.css" th:href="@{/css/diffview-custom.css}" rel="stylesheet">
+
+    <script th:if="false" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap-hover-dropdown/2.2.1/bootstrap-hover-dropdown.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/1000hz-bootstrap-validator/0.11.9/validator.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap-switch/4.0.0-alpha.1/js/bootstrap-switch.js" th:src="@{https://cdn.bootcss.com/bootstrap-switch/4.0.0-alpha.1/js/bootstrap-switch.min.js}"></script>
+    <script th:if="false" src="../../static/js/main.js"></script>
+    <script src="../../static/js/jsdifflib.js" th:src="@{/js/jsdifflib.js}"></script>
+    <script src="../../static/js/diffview-custom.js" th:src="@{/js/diffview-custom.js}"></script>
+
+    <style>
+        .history-area {
+            margin: 5px 5px 5px 5px;
+            padding-top: 5px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f2f2f2;
+        }
+
+        .history-area:last-child {
+            border-bottom: none;
+        }
+
+        .history-area .history-diff {
+            margin-top: 5px;
+            padding: 5px 5px 5px 5px;
+            background: #f2f2f2;
+            border-radius: 5px;
+        }
+
+        .history-area .text-diff {
+            margin: 5px;
+        }
+
+        .history-collapse {
+            cursor: pointer;
+            float: right;
+        }
+
+        .history-collapse:before {
+            content: "展开";
+        }
+
+        .history-collapse.in:before {
+            content: "收起";
+        }
+    </style>
+    <script>
+        $(function () {
+            function showTextDifference(div) {
+                var baseTextLines = difflib.stringAsLines(div.find(".text-diff-prev").text());
+                var currTextLines = difflib.stringAsLines(div.find(".text-diff-curr").text());
+                var opcodes = new difflib.SequenceMatcher(baseTextLines, currTextLines).get_opcodes();
+                div.find(".text-diff").empty().append(diffview.buildView({
+                    baseTextLines: baseTextLines,
+                    newTextLines: currTextLines,
+                    opcodes: opcodes,
+                    baseTextName: "修改前",
+                    newTextName: "修改后",
+                    onlyDifference: div.find(".text-diff-show-equal").prop("checked")
+                }));
+            }
+
+            $(".text-diff-show-equal").bootstrapSwitch({
+                onSwitchChange: function () {
+                    showTextDifference($(this).parents(".history-diff-text"));
+                }
+            });
+
+            $.each($(".history-diff-text"), function (i, historyDiv) {
+                showTextDifference($(historyDiv));
+            });
+
+            $(".history-collapse").on("click", function () {
+                $(this).parents(".history-area").find(".history-diff").slideToggle();
+                $(this).toggleClass("in");
+            });
+        });
+    </script>
+</head>
+<body>
+<!-- content -->
+<div class="container">
+    <div class="template-content" layout:fragment="template-content">
+        <div class="content-card">
+            <h3><a href="#" th:href="@{${article.url}}" th:text="${article.title}">标题</a></h3>
+            <div class="inner-inline">
+                作者<a href="#" th:href="@{${article.author.url}}" th:text="${article.author.name}">作者名</a>
+                创建时间 <span th:text="${T(net.sunxu.demo.sb.util.SbObjectUtils).date2String(article.releaseTime)}">2018-08-01 9:12</span>
+                <span th:unless="${article.releaseTime.equals(article.lastModifiedTime)}">最近修改 <i th:text="${T(net.sunxu.demo.sb.util.SbObjectUtils).date2String(article.lastModifiedTime)}">2018-08-01 10:10</i></span>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="history-area" th:each="his : ${histories}">
+                <div class="history-info">
+                    <span th:text="*{T(net.sunxu.demo.sb.util.SbObjectUtils).date2String(his.time)}">2018-1-1 10:10</span>
+                    <a href="#" th:href="@{*{his.user.url}}" th:text="*{his.user.name}">作者名</a>
+                    <span th:if="*{his.historyType == T(net.sunxu.demo.sb.vo.ArticleHistoryType).CREATE}">创建</span>
+                    <span th:if="*{his.historyType == T(net.sunxu.demo.sb.vo.ArticleHistoryType).ADD_ATTACHMENT}">添加附件</span>
+                    <span th:if="*{his.historyType == T(net.sunxu.demo.sb.vo.ArticleHistoryType).DELETE_ATTACHMENT}">删除附件</span>
+                    <span th:if="*{his.historyType == T(net.sunxu.demo.sb.vo.ArticleHistoryType).MODIFY_ABSTRACT}">修改摘要</span>
+                    <span th:if="*{his.historyType == T(net.sunxu.demo.sb.vo.ArticleHistoryType).MODIFY_ARTICLE}">修改文章</span>
+                    <span th:if="*{his.historyType == T(net.sunxu.demo.sb.vo.ArticleHistoryType).CHANGE_CATEGORY}">修改分类</span>
+                    <span th:if="*{his.historyType == T(net.sunxu.demo.sb.vo.ArticleHistoryType).ADMINISTRATOR_ACTION}">管理员操作</span>
+                    <span class="history-collapse in"></span>
+                </div>
+                <div class="history-diff">
+                    <div th:if="*{his.historyType == T(net.sunxu.demo.sb.vo.ArticleHistoryType).ADD_ATTACHMENT}">
+                        <a href="#" th:href="@{*{his.content}}" th:text="*{his.after}">附件名</a>
+                    </div>
+                    <div th:if="*{his.historyType == T(net.sunxu.demo.sb.vo.ArticleHistoryType).DELETE_ATTACHMENT}">
+                        <del th:text="*{his.before}">附件名</del>
+                    </div>
+                    <div class="history-diff-text"
+                         th:if="*{his.historyType == T(net.sunxu.demo.sb.vo.ArticleHistoryType).MODIFY_ABSTRACT || his.historyType == T(net.sunxu.demo.sb.vo.ArticleHistoryType).MODIFY_ARTICLE}">
+                        <div style="text-align: right;">
+                            <input type="checkbox" class="text-diff-show-equal" data-size="small" data-on-text="显示相同行" data-off-text="隐藏相同行" data-on-color="success" data-off-color="info"/>
+                        </div>
+                        <div class="text-diff"></div>
+                        <div class="text-diff-prev" hidden th:text="*{his.before}"></div>
+                        <div class="text-diff-curr" hidden th:text="*{his.after}"></div>
+                    </div>
+                    <div th:if="*{his.historyType == T(net.sunxu.demo.sb.vo.ArticleHistoryType).CHANGE_CATEGORY}">
+                        <span th:text="*{his.before}">之前</span>
+                        <span class="glyphicon glyphicon-arrow-right"></span>
+                        <span th:text="*{his.after}">之后</span>
+                    </div>
+                    <div th:if="*{his.historyType == T(net.sunxu.demo.sb.vo.ArticleHistoryType).ADMINISTRATOR_ACTION}">
+                        <span th:text="*{his.content}">锁定文章</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

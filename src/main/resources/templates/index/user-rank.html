@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="template/two-column-layout">
+<head>
+    <meta th:if="false" http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <meta th:if="false" name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link th:if="false" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/main.css" rel="stylesheet">
+    <script th:if="false" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap-hover-dropdown/2.2.1/bootstrap-hover-dropdown.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/1000hz-bootstrap-validator/0.11.9/validator.js"></script>
+    <script th:if="false" src="../../static/js/main.js"></script>
+    <link th:if="false" href="../../static/css/two-column-layout.css" rel="stylesheet"/>
+
+    <style>
+        .rank-link {
+            margin: 10px 5px 10px 5px;
+        }
+
+        .rank-content:not(:last-child) {
+            border-bottom: 1px solid #eaeaea;
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+        }
+
+        .pagination {
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+<!-- content -->
+<div class="container">
+    <div class="template-content" layout:fragment="template-content">
+        <div class="content-card">
+            <div class="inner-inline-block rank-content" th:each="user : ${users}">
+                <div>
+                    <img style="width: 50px; height: 50px;"
+                         th:src="${user.avatarUrl}"
+                         src="../../static/images/default-avatar.png"/>
+                </div>
+                <div style="vertical-align: top; margin-left: 20px">
+                    <a style="font-weight:20px; text-decoration: none" th:text="${user.name}" href="#" th:href="@{'/user/' + ${user.id}}">王大拿</a>
+                    <span th:text="${user.selfIntroduction}">介绍的内容</span>
+                    <p>
+                        <span class="glyphicon glyphicon-calendar" th:text="${#dates.format(user.registerTime, 'yyyy年MM月dd日')}">2018年1月1日</span>注册
+                        <span class="glyphicon glyphicon glyphicon-text-background" th:text="${user.articleCount}">10</span>篇文章
+                        <span class="glyphicon glyphicon-thumbs-up" th:text="${user.likeCount}">10</span>次被赞同
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <th:block th:replace="~{template/pagination::pagination(${pageCount}, ${page}, |/rank/user?type=${type}&count=${count}&page=|)}"></th:block>
+    </div>
+</div>
+</body>
+</html>

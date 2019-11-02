@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="template/two-column-layout">
+<head>
+    <meta th:if="false" http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <meta th:if="false" name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link th:if="false" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/main.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/two-column-layout.css" rel="stylesheet"/>
+
+    <script th:if="false" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap-hover-dropdown/2.2.1/bootstrap-hover-dropdown.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/1000hz-bootstrap-validator/0.11.9/validator.js"></script>
+    <script th:if="false" src="../../static/js/main.js"></script>
+    <script src="../../static/js/sidebar-dock.js" th:src="@{/js/sidebar-dock.js}"></script>
+    <script src="../../static/js/localstorage.js" th:src="@{/js/localstorage.js}"></script>
+    <style>
+        .nav-sidebar {
+            top: 42px;
+            text-align: right;
+            border-right: 2px solid #666666;
+        }
+
+        .time-line {
+            width: 150px;
+            color: #bcd47f;
+            float: right;
+        }
+
+        .time-line:hover, .time-line.active {
+            color: #337ab7;
+        }
+
+        .time-line-time, .time-line-time:hover, .time-line-time:focus {
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .time-line-spot {
+            display: inline-block;
+            position: relative;
+            right: -6px;
+            border: solid 5px;
+            border-radius: 5px;
+            margin-bottom: 1px;
+        }
+
+        .history-part li {
+            height: 25px;
+            margin-bottom: 0px;
+        }
+
+        .history-part .time-line-time {
+            text-align: right;
+            width: 50px;
+        }
+
+        .history-part .record {
+            color: #666666;
+        }
+    </style>
+    <script>
+        var topOffset;
+        $(function () {
+            topOffset = $.toNumber($("body").css("margin-top"));
+            sidebarDock($(".nav-sidebar"), $("#nav-container"), {
+                offset: {top: $(".panel-group").offset().top + topOffset}
+            });
+            $("body").scrollspy({
+                target: "#nav-container",
+                offset: topOffset
+            });
+
+            setLocalHistory();
+            showMore();
+        });
+
+        function setLocalHistory(successCallback) {
+            if(window.localStorage) {
+                showHistoryPart("本地记录", getViewHistory());
+            }
+        }
+
+        var startTime = new Date(),
+            dayInterval = 24 * 60 * 60 * 1000,
+            interval = [startTime.getTime() - startTime.getTime() % dayInterval, dayInterval, dayInterval, dayInterval * 4, dayInterval * 26, dayInterval * 30, dayInterval * 30],
+            intervalName = ["今天", "昨天", "前天", "三天前", "一周前", "30天前", "更早"],
+            verticalMargin = [0, 0, 0, 20, 40, 60, 60],
+            current = 0;
+
+        function showMore() {
+            var btn = $("#show-more");
+            btn.fadeOut("fast");
+            var wait = waitAnimation();
+            var endTime = new Date(startTime.getTime() + interval[current]);
+            $("#content").append(wait);
+            $.ajax("/user/view-history-list", {
+                type: "get",
+                dataType: "json",
+                cache: false,
+                data: {
+                    startTime: startTime,
+                    endTime: endTime
+                },
+                success: function (list) {
+                    showHistoryPart(intervalName[current], list);
+                    current++;
+                    startTime = endTime;
+                    wait.remove();
+                    if (current < interval.length) {
+                        btn.fadeIn("fast");
+                    }
+                }, errorHandler: function () {
+                    wait.remove();
+                    btn.fadeIn();
+                }
+            });
+        }
+
+        function showHistoryPart(title, list) {
+            var nav = $(
+                "<div class='time-line'>\n" +
+                "    <a class='time-line-time' href='#'></a>\n" +
+                "    <div class='time-line-spot'></div>\n" +
+                "</div>\n");
+            nav.css("margin-top", verticalMargin[current])
+                .find("a")
+                .attr("href", "#" + title)
+                .text(title)
+                .click(function (event) {
+                    event.preventDefault();
+                    $($(this).attr('href'))[0].scrollIntoView();
+                    scrollBy(0, 1 - topOffset);
+                });
+            $(".nav-sidebar").append(nav);
+
+
+            var newPart = $(
+                "<ul class='history-part list-unstyled'>\n" +
+                "    <h5><b class='history-title'></b></h5>\n" +
+                "</ul>\n");
+            newPart.find(".history-title").text(title).attr("id", title);
+            if (list.length > 0) {
+                $.each(list, function (i, item) {
+                    var li = $(
+                        "<li class='record inner-inline-block'>\n" +
+                        "    <p class='history-time'></p>\n" +
+                        "    <a href='#' class='history-url'></a>\n" +
+                        "</li>\n");
+                    item.time = new Date(item.time);
+                    li.find("p").text(item.time.interval());
+                    li.find("a")
+                        .attr("href", item.url)
+                        .text(item.title);
+                    newPart.append(li);
+                });
+            } else {
+                newPart.append("<p>无记录</p>");
+            }
+            var content = $("#content");
+            if (content.html()) {
+                content.append("<hr style='margin: 10px;' />");
+            }
+            content.append(newPart);
+            $("body").scrollspy("refresh");
+        }
+    </script>
+</head>
+<body>
+<!-- content -->
+<div class="container">
+    <div class="template-content" layout:fragment="template-content">
+        <ol class="breadcrumb" layout:fragment="breadcrumb">
+            <li><a href="#">用户</a></li>
+            <li class="active">浏览历史</li>
+        </ol>
+
+        <div id="nav-container" class="col-sm-3 hidden-xs">
+            <div class="nav nav-sidebar"></div>
+        </div>
+
+        <div class="col-sm-9 panel-group">
+            <div id="content"></div>
+            <button id="show-more" class="btn btn-default" style="display:none;" onclick="javascript:showMore()">
+                加载更多
+            </button>
+        </div>
+    </div>
+</div>
+</body>
+</html>

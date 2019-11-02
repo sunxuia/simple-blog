@@ -1,0 +1,66 @@
+#debug: true
+server.port: 8080
+logging:
+  level:
+    root: info
+    org.apache.coyote.http11.Http11InputBuffer: debug
+    org.springframework.web: info
+    org.hibernate: info
+    org.hibernate.resource.jdbc.internal.ResourceRegistryStandardImpl: trace
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
+  pattern.console: '[%blue(%d{mm:ss.SSS})][%yellow(%20thread{20})][%green(%50logger{50})][%highlight(%-5level)]: %msg\n'
+
+spring:
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
+    mode: HTML5
+    encoding: UTF-8
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://mysql-server:3306/devdb_simpleblog?character=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2B8
+    username: root
+    password: 123456
+  redis:
+    database: 1
+    host: redis-server
+    port: 6379
+    timeout: 3s
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    properties.hibernate.format_sql: true
+  data.elasticsearch:
+    cluster-nodes: es-server:9300
+    cluster-name: docker-cluster
+    properties:
+      transport.tcp.connect_timeout: 120s
+      client.name: null
+  jackson:
+    serialization:
+      indent_output: true
+multipart:
+  maxFileSize: 5M
+  maxRequestSize: 5M
+
+fastdfs:
+  server-url: "http://fastdfs-server:8888"
+  config-file: "config/fdfs_client.conf"
+
+social:
+  weibo:
+    clientId: 644336069
+    clientSecret: be57719150f4085a92120bd2f012861a
+  github:
+    clientId: 4b7c4d8da7668e66b851
+    clientSecret: cff6aeb515ddffdd1ad411a21c2a4a4d7fa2453d
+  gitlab:
+    clientId: 7a4bad406607058c8e6dab50a83342a523c01321f01766a530ed5871383b9768
+    clientSecret: 09e63089ec106d3d70f07bdbea6caf3dfeb64013b304367897c725e003b78459
+  facebook:
+    clientId: 295460234539472
+    clientSecret: 27d0b5a09a668c8578293559f770bea1
+

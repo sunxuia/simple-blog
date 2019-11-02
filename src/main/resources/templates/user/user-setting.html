@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+      layout:decorate="template/two-column-layout">
+<head>
+    <meta th:if="false" http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <meta th:if="false" name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link th:if="false" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/main.css" rel="stylesheet">
+    <link th:if="false" href="../../static/css/two-column-layout.css" rel="stylesheet"/>
+    <link href="https://cdn.bootcss.com/bootstrap-fileinput/4.4.8/css/fileinput.css" th:href="@{https://cdn.bootcss.com/bootstrap-fileinput/4.4.8/css/fileinput.min.css}" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/bootstrap-switch/4.0.0-alpha.1/css/bootstrap-switch.css" th:href="@{https://cdn.bootcss.com/bootstrap-switch/4.0.0-alpha.1/css/bootstrap-switch.min.css}" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/jquery-jcrop/2.0.4/css/Jcrop.css" th:href="@{https://cdn.bootcss.com/jquery-jcrop/2.0.4/css/Jcrop.min.css}" rel="stylesheet">
+    <link href="../../static/css/city-select.css" th:href="@{/css/city-select.css}" rel="stylesheet"/>
+    <link href="../../static/css/user-setting.css" th:href="@{/css/user-setting.css}" rel="stylesheet"/>
+
+    <script th:if="false" src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/bootstrap-hover-dropdown/2.2.1/bootstrap-hover-dropdown.js"></script>
+    <script th:if="false" src="https://cdn.bootcss.com/1000hz-bootstrap-validator/0.11.9/validator.js"></script>
+    <script th:if="false" src="../../static/js/main.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap-fileinput/4.4.8/js/fileinput.js" th:src="@{https://cdn.bootcss.com/bootstrap-fileinput/4.4.8/js/fileinput.min.js}"></script>
+    <script src="https://cdn.bootcss.com/bootstrap-fileinput/4.4.8/js/locales/zh.js" th:src="@{https://cdn.bootcss.com/bootstrap-fileinput/4.4.8/js/locales/zh.min.js}"></script>
+    <script src="https://cdn.bootcss.com/jquery-jcrop/2.0.4/js/Jcrop.js" th:src="@{https://cdn.bootcss.com/jquery-jcrop/2.0.4/js/Jcrop.min.js}"></script>
+    <script src="https://cdn.bootcss.com/bootstrap-switch/4.0.0-alpha.1/js/bootstrap-switch.js" th:src="@{https://cdn.bootcss.com/bootstrap-switch/4.0.0-alpha.1/js/bootstrap-switch.min.js}"></script>
+    <script src="../../static/js/avatar-upload.js" th:src="@{/js/avatar-upload.js}"></script>
+    <script src="../../static/js/city-select.js" th:src="@{/js/city-select.js}"></script>
+    <script src="../../static/js/city-select.json.js" th:src="@{/js/city-select.json.js}"></script>
+    <script src="../../static/js/sidebar-dock.js" th:src="@{/js/sidebar-dock.js}"></script>
+    <script type="text/javascript">
+        $(function () {
+            var topOffset = $.toNumber($("body").css("margin-top"));
+            sidebarDock($(".nav-sidebar"), $("#nav-container"), {
+                offset: {top: $(".panel-group").offset().top - topOffset}
+            });
+            $("body").scrollspy({
+                target: "#nav-container",
+                offset: topOffset
+            });
+            $('.nav-sidebar li a').click(function (event) {
+                event.preventDefault();
+                $($(this).attr('href'))[0].scrollIntoView();
+                scrollBy(0, 1 - topOffset);
+            });
+
+            $(".setting-panel .panel-head > a").on("click", function () {
+                var panel = $(this).parents(".setting-panel");
+                panel.find(".panel-body").slideToggle("fast");
+                panel.toggleClass("expand");
+            });
+            $(".city-select button").click(function (e) {
+                selectArea($("[name=city]"), $(".city-holder"));
+            });
+            $("[type=checkbox]").bootstrapSwitch({
+                size: "",
+                onColor: "success",
+                offColor: "info",
+                onText: "接收",
+                offText: "不接收",
+                onSwitchChange: function () {
+                    var name = $(this).attr("name");
+                    var isChecked = $(this).parents("bootstrap-switch").hasClass("bootstrap-switch-on");
+                    $.put("/setting/notify", {
+                        "name": name,
+                        "checked": isChecked
+                    })
+                }
+            });
+
+            $(".btn-change-user-name").on("click", function () {
+                $.post("/setting/user-name", {
+                    userName: $("#user-name").val()
+                }, function (data) {
+                    var resp = $("#user-name-response");
+                    if (data.key) {
+                        resp.attr("class", "");
+                    } else {
+                        resp.attr("class", "alert-danger");
+                        resp.text(data.value);
+                    }
+                });
+            });
+
+            $(".btn-change-user-info").on("click", function () {
+                var form = $(this).parents("form");
+                $.ajax("/setting/user-info", {
+                    method: "post",
+                    headers: {'Content-type': 'application/json;charset=UTF-8'},
+                    data: JSON.stringify(form.serializeObject()),
+                    success: function (data) {
+                        var resp = form.find(".response");
+                        if (data.key) {
+                            resp.attr("class", "");
+                        } else {
+                            resp.attr("class", "alert-danger");
+                            resp.text(data.value);
+                        }
+                    }
+                });
+            });
+
+            $(".panel-head a").click();
+
+            var error = "[(${error})]";
+            if (error.length) {
+                flashModal("alert alert-danger", error);
+            }
+        });
+    </script>
+</head>
+<body>
+<!-- content -->
+<div class="container">
+    <div class="template-content" layout:fragment="template-content">
+        <ol class="breadcrumb" layout:fragment="breadcrumb">
+            <li><a href="#">用户</a></li>
+            <li class="active">设置</li>
+        </ol>
+
+        <div id="nav-container" class="col-md-2 hidden-sm">
+            <ul class="nav nav-sidebar hidden-sm">
+                <li><a href="#panel-username">头像 | 用户名</a></li>
+                <li><a href="#panel-userinfo">用户信息</a></li>
+                <li><a href="#panel-social">账号绑定</a></li>
+                <li><a href="#panel-inform">通知设置</a></li>
+            </ul>
+        </div>
+
+        <div class="col-md-10 panel-group">
+            <div id="panel-username" class="setting-panel">
+                <div class="panel-head inner-inline-block">
+                    <div>
+                        <h4 class="setting-title"><b>头像 | 用户名</b></h4>
+                        <small class="setting-introduction">修改个人头像和用户名称</small>
+                    </div>
+                    <a href="javascript:void(0)"></a>
+                </div>
+                <div class="panel-body container-fluid sm-splitted">
+                    <div class="col-sm-6 text-center">
+                        <img class="avatar-preview"
+                             src="../../static/images/default-avatar.png"
+                             th:src="@{${avatarUrl}}"
+                             data-toggle="modal" data-target="#avatar-upload"/>
+                        <div id="avatar-upload" class="modal fade" role="dialog">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4><strong>上传头像</strong></h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form role="form" enctype="multipart/form-data" method="post">
+                                            <div class="embed-responsive embed-responsive-16by9">
+                                                <div class="embed-responsive-item">
+                                                    <img src="../../static/images/default-avatar.png"
+                                                         th:src="@{${avatarUrl}}"
+                                                         id="cut-img" class="img-responsive img-thumbnail"/>
+                                                </div>
+                                            </div>
+
+                                            <input type="file" name="avatar" id="fileUpload"/>
+                                            <div id="alert" class="alert alert-danger hidden" role="alert"></div>
+                                            <input type="hidden" id="avatar-x" name="avatar-x"/>
+                                            <input type="hidden" id="avatar-y" name="avatar-y"/>
+                                            <input type="hidden" id="avatar-width" name="avatar-width"/>
+                                            <input type="hidden" id="avatar-height" name="avatar-height"/>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary btn-ok">确认</button>
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <form class="form-horizontal" role="form" style="margin-left: 10px;">
+                            <div class="form-group">
+                                <label for="user-name" class="control control-label">用户名</label>
+                                <input type="text" autocomplete="off" class="form-control" id="user-name" th:value="${userName}"/>
+                                <div id="user-name-response"></div>
+                            </div>
+                            <div class="text-center">
+                                <button type="button" class="btn btn-primary btn-change-user-name">修改</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div id="panel-userinfo" class="setting-panel">
+                <div class="panel-head inner-inline-block">
+                    <div>
+                        <h4 class="setting-title"><b>用户信息</b></h4>
+                        <small class="setting-introduction">修改用户的个人信息</small>
+                    </div>
+                    <a href="javascript:void(0)"></a>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label class="control col-sm-3 control-label">自我介绍</label>
+                            <div class="col-sm-9">
+                                <textarea name="selfIntroduction" class="form-control" rows="3" th:text="${userInfo.selfIntroduction}"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control col-sm-3 control-label">性别</label>
+                            <div class="col-sm-9">
+                                <div class="btn-group" data-toggle="buttons">
+                                    <label class="btn btn-default" th:classappend="${userInfo.gender == T(net.sunxu.demo.sb.vo.Gender).MALE ? 'active' : ''}">
+                                        <input type="radio" name="gender" value="MALE" autocomplete="off" th:checked="${userInfo.gender == T(net.sunxu.demo.sb.vo.Gender).MALE}">男
+                                    </label>
+                                    <label class="btn btn-default" th:classappend="${userInfo.gender == T(net.sunxu.demo.sb.vo.Gender).FEMALE ? 'active' : ''}">
+                                        <input type="radio" name="gender" value="FEMALE" autocomplete="off" th:checked="${userInfo.gender == T(net.sunxu.demo.sb.vo.Gender).FEMALE}">女
+                                    </label>
+                                    <label class="btn btn-default" th:classappend="${userInfo.gender == T(net.sunxu.demo.sb.vo.Gender).UNKNOWN ? 'active' : ''}">
+                                        <input type="radio" name="gender" value="UNKNOWN" autocomplete="off" th:checked="${userInfo.gender == T(net.sunxu.demo.sb.vo.Gender).UNKNOWN}">秘密
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control col-sm-3 control-label">城市</label>
+                            <div class="col-sm-9 city-select">
+                                <div class="input-group">
+                                    <input type="text" autocomplete="off" name="city" class="form-control primary" readonly="true" th:value="${userInfo.city}">
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default">
+                                            <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="city-holder"></div>
+                        <div class="response"></div>
+                        <div class="text-center">
+                            <button type="button" class="btn btn-primary btn-change-user-info">修改</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div id="panel-social" class="setting-panel">
+                <div class="panel-head inner-inline-block">
+                    <div>
+                        <h4 class="setting-title"><b>账号绑定</b></h4>
+                        <small class="setting-introduction">绑定常用的第三方账号</small>
+                    </div>
+                    <a href="javascript:void(0)"></a>
+                </div>
+                <div class="panel-body inner-inline">
+                    <div class="social-item">
+                        <div class="social-item-image">
+                            <svg height="50" width="50" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
+                            </svg>
+                        </div>
+                        <div class="social-item-option" th:unless="${#strings.isEmpty(socialBind.github)}">
+                            <p th:text="${socialBind.github}">me</p>
+                            <form method="post" action="/" th:action="@{/setting/connect/github}">
+                                <input type="hidden" name="_method" value="delete"/>
+                                <button type="submit" class="btn btn-link">解除绑定</button>
+                            </form>
+                        </div>
+                        <div class="social-item-option" th:if="${#strings.isEmpty(socialBind.github)}">
+                            <a href="#" th:href="@{/setting/connect/github}">绑定账号</a>
+                        </div>
+                    </div>
+                    <div class="social-item">
+                        <div class="social-item-image">
+                            <svg height="50" width="50" viewBox="0 0 36 36">
+                                <path fill="#000000" d="M2 14l9.38 9v-9l-4-12.28c-.205-.632-1.176-.632-1.38 0z"></path>
+                                <path fill="#000000" d="M34 14l-9.38 9v-9l4-12.28c.205-.632 1.176-.632 1.38 0z"></path>
+                                <path fill="#000000" d="M18,34.38 3,14 33,14 Z"></path>
+                                <path fill="#505050" d="M18,34.38 11.38,14 2,14 6,25Z"></path>
+                                <path fill="#505050" d="M18,34.38 24.62,14 34,14 30,25Z"></path>
+                                <path fill="#a0a0a0" d="M2 14L.1 20.16c-.18.565 0 1.2.5 1.56l17.42 12.66z"></path>
+                                <path fill="#a0a0a0" d="M34 14l1.9 6.16c.18.565 0 1.2-.5 1.56L18 34.38z"></path>
+                            </svg>
+                        </div>
+                        <div class="social-item-option" th:unless="${#strings.isEmpty(socialBind.gitlab)}">
+                            <p th:text="${socialBind.gitlab}">me</p>
+                            <form method="post" action="/" th:action="@{/setting/connect/gitlab}">
+                                <input type="hidden" name="_method" value="delete"/>
+                                <button type="submit" class="btn btn-link">解除绑定</button>
+                            </form>
+                        </div>
+                        <div class="social-item-option" th:if="${#strings.isEmpty(socialBind.gitlab)}">
+                            <a href="#" th:href="@{/setting/connect/gitlab}">绑定账号</a>
+                        </div>
+                    </div>
+                    <div class="social-item">
+                        <div class="social-item-image">
+                            <svg height="50" width="50" viewBox="0 0 37 30">
+                                <path fill="#000000" d="M36.539,12.806 C36.539,12.808 36.539,12.810 36.539,12.812 C36.297,13.556 35.498,13.964 34.754,13.723 C34.008,13.482 33.600,12.683 33.841,11.937 L33.840,11.937 C34.580,9.646 34.111,7.033 32.384,5.117 C30.656,3.201 28.108,2.470 25.753,2.970 C24.987,3.133 24.234,2.644 24.071,1.878 C23.907,1.114 24.395,0.360 25.161,0.195 L25.162,0.195 C28.472,-0.509 32.058,0.519 34.489,3.217 C36.921,5.911 37.577,9.584 36.539,12.806 ZM26.721,7.506 L26.721,7.505 C26.064,7.648 25.415,7.226 25.274,6.568 C25.133,5.908 25.553,5.259 26.212,5.119 C27.825,4.775 29.572,5.274 30.756,6.588 C31.941,7.901 32.259,9.690 31.752,11.260 C31.545,11.902 30.857,12.252 30.216,12.047 C29.574,11.839 29.224,11.150 29.431,10.509 L29.429,10.509 C29.678,9.741 29.522,8.866 28.943,8.224 C28.365,7.583 27.510,7.340 26.721,7.506 ZM27.210,9.790 C27.851,10.706 27.789,11.990 27.198,13.478 C26.925,14.163 27.283,14.269 27.804,14.426 C29.927,15.084 32.291,16.678 32.291,19.485 C32.291,24.132 25.594,29.985 15.526,29.985 C7.847,29.985 -0.003,26.261 -0.003,20.135 C-0.003,16.933 2.025,13.230 5.516,9.736 C10.179,5.072 15.616,2.947 17.661,4.994 C18.563,5.896 18.650,7.458 18.070,9.323 C17.768,10.262 18.951,9.742 18.951,9.744 C22.720,8.165 26.008,8.072 27.210,9.790 ZM25.923,19.401 C25.526,15.377 20.236,12.605 14.107,13.211 C7.980,13.818 3.333,17.572 3.731,21.597 C4.129,25.623 9.419,28.394 15.547,27.789 C21.676,27.183 26.320,23.428 25.923,19.401 ZM11.584,26.060 C8.638,25.108 7.391,22.198 8.681,19.576 C9.948,17.005 13.243,15.551 16.159,16.310 C19.177,17.090 20.717,19.939 19.484,22.705 C18.233,25.536 14.636,27.045 11.584,26.060 ZM13.248,20.549 C12.299,20.151 11.073,20.560 10.487,21.479 C9.894,22.402 10.173,23.501 11.115,23.930 C12.071,24.367 13.340,23.952 13.933,23.006 C14.515,22.050 14.208,20.958 13.248,20.549 ZM15.587,19.579 C15.223,19.434 14.768,19.609 14.554,19.968 C14.347,20.328 14.461,20.738 14.826,20.888 C15.197,21.041 15.671,20.865 15.885,20.498 C16.090,20.129 15.957,19.714 15.587,19.579 Z" class="cls-1"/>
+                            </svg>
+                        </div>
+                        <div class="social-item-option" th:unless="${#strings.isEmpty(socialBind.weibo)}">
+                            <p th:text="${socialBind.weibo}">me</p>
+                            <form method="post" action="/" th:action="@{/setting/connect/weibo}">
+                                <input type="hidden" name="_method" value="delete"/>
+                                <button type="submit" class="btn btn-link">解除绑定</button>
+                            </form>
+                        </div>
+                        <div class="social-item-option" th:if="${#strings.isEmpty(socialBind.weibo)}">
+                            <a href="#" th:href="@{/setting/connect/weibo}">绑定账号</a>
+                        </div>
+                    </div>
+                    <div class="social-item">
+                        <div class="social-item-image">
+                            <svg height="50" width="50" viewBox="0 0 36.969 29.031">
+                                <path fill="#000000" fill-rule="evenodd" d="M14.000,6.000 L17.986,5.871 L18.000,0.000 L13.000,0.000 C6.681,0.056 5.000,3.428 5.000,8.000 L5.000,11.000 L-0.000,11.000 L-0.000,17.000 L5.000,17.000 L5.000,33.000 L12.000,33.000 L12.000,17.000 L18.000,17.000 L17.986,11.034 L12.000,11.000 L12.000,8.000 C12.000,6.905 11.764,6.113 14.000,6.000 Z"/>
+                            </svg>
+                        </div>
+                        <div class="social-item-option" th:unless="${#strings.isEmpty(socialBind.facebook)}">
+                            <p th:text="${socialBind.facebook}">me</p>
+                            <a onclick="showModal($(this).text(),$('<iframe style=\'width: 100%;height:500px;border:none\' src=\'https://api.weibo.com/oauth2/authorize\'></iframe>'))" href="javascript:void(0)">解除绑定</a>
+                        </div>
+                        <div class="social-item-option" th:if="${#strings.isEmpty(socialBind.facebook)}">
+                            <a href="#" th:href="@{/setting/connect/facebook}">绑定账号</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="panel-inform" class="setting-panel">
+                <div class="panel-head inner-inline-block">
+                    <div>
+                        <h4 class="setting-title"><b>通知设置</b></h4>
+                        <small class="setting-introduction">设置有关我的消息的通知</small>
+                    </div>
+                    <a href="javascript:void(0)"></a>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal" style="vertical-align: top;">
+                        <div class="form-group">
+                            <label class="control col-sm-3 control-label">文章被点赞</label>
+                            <div class="col-sm-9">
+                                <input type="checkbox" name="article-liked" th:checked="${notify.articleLiked}"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control col-sm-3 control-label">文章被评论</label>
+                            <div class="col-sm-9">
+                                <input type="checkbox" name="article-commented" th:checked="${notify.articleCommented}"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control col-sm-3 control-label">评论被回复</label>
+                            <div class="col-sm-9">
+                                <input type="checkbox" name="comment-replied" th:checked="${notify.commentReplied}"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control col-sm-3 control-label">评论被点赞</label>
+                            <div class="col-sm-9">
+                                <input type="checkbox" name="comment-liked" th:checked="${notify.commentReplied}"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>

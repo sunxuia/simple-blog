@@ -1,0 +1,52 @@
+.areas {
+    margin: 5px 5px 5px 5px;
+    border: solid 1px #d9d9d9;
+    -webkit-box-shadow: 3px 3px 3px #f6f6f6;
+    -moz-box-shadow: 3px 3px 3px #f6f6f6;
+    box-shadow: 3px 3px 3px #f6f6f6;
+    -moz-border-radius: 4px 4px 0px 0px;
+    -webkit-border-radius: 4px 4px 0px 0px;
+    border-radius: 4px 4px 0px 0px;
+}
+
+.areas .area-title {
+    margin: 0px auto 0px auto;
+    padding: 8px 15px 8px 15px;
+    background-color: #eeeeee;
+    border-bottom: solid 1px #d9d9d9;
+}
+
+.areas .area-selections {
+    padding: 5px 5px 5px 5px;
+    background-color: #ffffff;
+}
+
+.areas .btn-area {
+    margin: 3px 4px 3px 4px;
+    overflow: hidden;
+    background: #f0f0f0;
+    border: 1px solid #ebebeb;
+    -webkit-box-shadow: 1px 1px 1px #f6f6f6;
+    -moz-box-shadow: 1px 1px 1px #f6f6f6;
+    box-shadow: 1px 1px 1px #f6f6f6;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+}
+
+.areas .btn-area:hover {
+    background-color: rgba(148, 216, 246, 0.3);
+}
+
+.areas .btn-return {
+    margin: 3px 4px 3px 4px;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #ebebeb;
+    -webkit-box-shadow: 1px 1px 1px #f6f6f6;
+    -moz-box-shadow: 1px 1px 1px #f6f6f6;
+    box-shadow: 1px 1px 1px #f6f6f6;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+}

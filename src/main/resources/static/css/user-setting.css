@@ -1,0 +1,133 @@
+.nav-sidebar {
+    text-align: right;
+}
+
+.nav-sidebar.affix {
+    top: 42px;
+}
+
+.nav-sidebar li {
+    list-style-type: none;
+    position: relative;
+    width: 100%;
+    padding-right: 10px;
+}
+
+.nav-sidebar li a {
+    color: #337ab7;
+    display: block;
+    padding: 2px 2px;
+    text-decoration: none;
+}
+
+.nav-sidebar li a:hover:not(.disabled) {
+    color: purple;
+    background-color: transparent;
+}
+
+.nav-sidebar li:hover:not(.disabled) {
+    color: purple;
+    border: 0px;
+    border-right: 2px solid purple;
+    padding-right: 8px;
+    background: transparent;
+    -webkit-box-shadow: 1px 0px 0px rgba(26, 26, 26, 0.1);
+    -moz-box-shadow: 1px 0px 0px rgba(26, 26, 26, 0.1);
+    box-shadow: 1px 0px 0px rgba(26, 26, 26, 0.1);
+}
+
+.nav-sidebar li.active {
+    color: purple;
+    border: 0px;
+    border-right: 3px solid purple;
+    padding-right: 7px;
+    background: transparent;
+    -webkit-box-shadow: 1px 0px 0px rgba(26, 26, 26, 0.1);
+    -moz-box-shadow: 1px 0px 0px rgba(26, 26, 26, 0.1);
+    box-shadow: 1px 0px 0px rgba(26, 26, 26, 0.1);
+}
+
+.setting-panel {
+    border: 1px solid #ebebeb;
+    background-color: #ffffff;
+    margin: 0px 20px 0px 20px;
+    padding: 10px 15px 10px 15px;
+    min-width: 300px;
+}
+
+.setting-panel.expand {
+    background-color: #f5f6f8;
+}
+
+.setting-panel .panel-head {
+    padding-bottom: 10px;
+}
+
+.setting-panel.expand .panel-head {
+    border-bottom: 1px solid #ebebeb;
+}
+
+.setting-panel .panel-head > a {
+    text-decoration: none;
+    color: #337ab7;
+    float: right;
+    margin-top: 25px;
+}
+
+.setting-panel .panel-head a:hover {
+    text-decoration: none;
+    color: darkcyan;
+}
+
+.setting-panel .panel-head a:before {
+    content: "编辑";
+}
+
+.setting-panel.expand .panel-head a:before {
+    content: "收起";
+}
+
+.setting-panel .panel-head .setting-introduction {
+    display: block;
+    color: gray;
+}
+
+.setting-panel .panel-body {
+    display: none;
+}
+
+.setting-panel img.avatar-preview {
+    width: 75%;
+    height: auto;
+    max-width: 100px;
+    max-height: 100px;
+    cursor: pointer;
+}
+
+#panel-username .file-input {
+    margin-top: 10px;
+}
+
+#panel-username .embed-responsive-item img {
+    width: 50%;
+    height: auto;
+    max-height: 100%;
+}
+
+#panel-username .jcrop-active {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.social-item {
+    vertical-align: top;
+    text-align: center;
+    width: 60px;
+    word-wrap: break-word;
+    word-break: normal;
+    margin: 5px 10px 5px 10px;
+}
+
+.social-item .social-item-option {
+
+}
